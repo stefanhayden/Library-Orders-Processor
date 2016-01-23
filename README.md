@@ -1,5 +1,7 @@
 # Library-Orders-Processor
 
+This is a script for the Google Sheets Script Editor. To use copy and paste into the Google Sheets Script Editor and you will get a new menu on your spreadsheet.
+
 Mover Orders though a simple process of 'To Be Ordered' -> 'On Order' -> 'Received'
 Each Department can have it's own flow so they know the status of thier own books
 
