@@ -15,7 +15,7 @@ function onOpen() {
  var ss = SpreadsheetApp.getActiveSpreadsheet(),
      options = [
       {name:"Process Changes", functionName:"approveRequests"},
-      {name:"Toggle Sheets Lock", functionName:"toggleLockSheets"}
+      {name:"Toggle Active Sheet Lock", functionName:"toggleLockSheet"}
      ];
  ss.addMenu("Library Actions", options);
 }
@@ -25,12 +25,29 @@ function approveRequests() {
   const logSheet = ss.getSheetByName('Logs') || ss.insertSheet('Logs');
   const sheets = ss.getSheets();
   const startTime = new Date();
-  var protections = [];
+  //var protections = [];
+  
+  const LastRowInLogSheet = logSheet.getLastRow();
+  const LastColumnInLogSheet = logSheet.getLastColumn();
+  
+  if(LastRowInLogSheet && LastColumnInLogSheet) {
+    const LastLogSheetValue = logSheet.getRange(LastRowInLogSheet, LastColumnInLogSheet).getValue();
+    
+    if (LastLogSheetValue !== 'SCRIPT FINISHED') {
+      const ui = SpreadsheetApp.getUi(); // Same variations.
+      
+      const result = ui.alert(
+        'STOP',
+        'You are trying to run the script more then once. \r\n Please check the Log tab to see when the script is finished. \r\n\r\n If you are 100% sure the script is not runing delete the Logs tab and run script again.',
+        ui.ButtonSet.OK);
+      return;
+    }
+  }
   
   logSheet.clear();
   logSheet.appendRow(['STARTING SCRIPT ' + startTime]);
   
-
+/*
   logSheet.appendRow(['Locking all sheets in spreadsheet']);
   
   sheets.forEach(function(sheet, index) {
@@ -45,7 +62,7 @@ function approveRequests() {
   });
   
   logSheet.appendRow(['All Sheets are locked']);
-  
+ */
   
   // Sheet Types
   const TO_BE_ORDERED = 'To Be Ordered';
@@ -118,10 +135,12 @@ function approveRequests() {
     
   });
   
+  /*
   protections.forEach(function(protection, index) {
       protection.remove();
   });
   logSheet.appendRow(['All Sheets are unlocked']);
+  */
   
   const endTime = new Date();
   logSheet.appendRow(['SCRIPT TOOK: ' + ((endTime - startTime) / 1000) + ' SECONDS']);
@@ -131,9 +150,9 @@ function approveRequests() {
 
 
 
-function toggleLockSheets() {
+function toggleLockSheet() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheets = ss.getSheets();
+  const sheets = [ss.getActiveSheet()];
   var protections = [];
   
   sheets.forEach(function(sheet, index) {
